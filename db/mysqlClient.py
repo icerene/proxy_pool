@@ -50,7 +50,7 @@ class MysqlClient(object):
         self.__fields_tuple = ("proxy", "fail_count", "region", "type", "source", "check_count", "last_status", "last_time")
         self.__fields_string = ", ".join(self.__fields_tuple)
         
-    def connect_db():
+    def connect_db(self):
         self.__mydb = mysql.connector.connect(
             host=self.host,
             user=self.user,
@@ -59,7 +59,7 @@ class MysqlClient(object):
         )
         self.__conn = self.__mydb.cursor()
 
-    def close_db():
+    def close_db(self):
         self.__conn.close()
         self.__mydb.close()
 
