@@ -160,10 +160,10 @@ class MysqlClient(object):
         返回代理数量
         :return:
         """
-        self.__conn.execute("SELECT COUNT(*) FROM %s", (self.name))
+        sql = "SELECT COUNT(*) FROM " + self.name
+        self.__conn.execute(sql)
         result = self.__conn.fetchone()
-        count = result[0]
-        return self.__conn.hlen(self.name)
+        return result[0]
 
     def changeTable(self, name):
         """
