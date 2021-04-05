@@ -188,6 +188,5 @@ class MysqlClient(object):
         except ConnectionError as e:
             log.error('mysql connection error: %s' % str(e), exc_info=True)
             return e
-        except ResponseError as e:
-            log.error('mysql connection error: %s' % str(e), exc_info=True)
-            return e
+        except mysql.connector.Error as err:
+            log.error("Something went wrong: {}".format(err), exc_info=True)
