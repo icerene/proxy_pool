@@ -64,7 +64,11 @@ class MysqlClient(object):
         self.__mydb.close()
 
     def get_cursor(self, conn):
-        return conn.cursor()
+        try:
+            return conn.cursor()
+        except mysql.connector.errors.OperationalError as err:
+            self.__mydb.reconnect(attempts=1, delay=0)
+            return self.__mydb.cursor()
 
     def close_cursor(self, cursor):
         cursor.close()
