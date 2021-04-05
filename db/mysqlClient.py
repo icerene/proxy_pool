@@ -175,7 +175,7 @@ class MysqlClient(object):
         result = self.__conn.fetchone()
         count = result[0]
         if 0 == count:
-            self.__conn.execute("CREATE TABLE proxy (id INT AUTO_INCREMENT PRIMARY KEY, proxy VARCHAR(255), fail_count int unsigned, region VARCHAR(255), type VARCHAR(255), source VARCHAR(255), check_count int unsigned, last_status VARCHAR(255), last_time VARCHAR(255))")
+            self.__conn.execute("CREATE TABLE " + name + " (id INT AUTO_INCREMENT PRIMARY KEY, proxy VARCHAR(255), fail_count int unsigned, region VARCHAR(255), type VARCHAR(255), source VARCHAR(255), check_count int unsigned, last_status VARCHAR(255), last_time VARCHAR(255))")
 
     def test(self):
         log = LogHandler('mysql_client')
