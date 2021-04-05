@@ -85,7 +85,7 @@ class MysqlClient(object):
         :return:
         """
         self.connect_db()
-        sql = "INSERT INTO customers (" + self.__fields_string + ") VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        sql = "INSERT INTO " + self.db_name + " (" + self.__fields_string + ") VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
         proxy_dict = proxy_obj.to_dict
         proxy_tuple = tuple(proxy_dict.values())
         self.__conn.execute(sql, proxy_tuple)
@@ -105,7 +105,7 @@ class MysqlClient(object):
         proxy = self.__conn.fetchone()
         proxy_dict = dict(zip(self.__fields_tuple,proxy))
         if proxy:
-            sql = "DELETE FROM customers WHERE proxy = '" + proxy_dict.get("proxy", None) + "'"
+            sql = "DELETE FROM " + self.db_name + " WHERE proxy = '" + proxy_dict.get("proxy", None) + "'"
             self.__conn.execute(sql)
             self.__mydb.commit()
             self.close_db()
@@ -121,7 +121,7 @@ class MysqlClient(object):
         :return:
         """
         self.connect_db()
-        sql = "DELETE FROM customers WHERE proxy = '" + proxy_str + "'"
+        sql = "DELETE FROM " + self.db_name + " WHERE proxy = '" + proxy_str + "'"
         self.__conn.execute(sql)
         self.__mydb.commit()
         rowcount = self.__conn.rowcount
@@ -148,7 +148,7 @@ class MysqlClient(object):
         :return:
         """
         self.connect_db()
-        sql = "UPDATE customers SET proxy = %s, fail_count = %s, region = %s, type = %s, source = %s, check_count = %s, last_status = %s, last_time = %s WHERE proxy = %s"
+        sql = "UPDATE " + self.db_name + " SET proxy = %s, fail_count = %s, region = %s, type = %s, source = %s, check_count = %s, last_status = %s, last_time = %s WHERE proxy = %s"
         proxy_dict = proxy_obj.to_dict
         proxy_str = proxy_dict.get('proxy')
         proxy_tuple = tuple(proxy_dict.values())
