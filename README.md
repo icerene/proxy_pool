@@ -66,6 +66,10 @@ PORT = 5000                    # 监听端口
 
 DB_CONN = 'redis://:pwd@127.0.0.1:8888/0'
 
+# 如果使用MYSQL 
+
+安装 python -m pip install mysql-connector-python
+
 
 # 配置 ProxyFetcher
 
@@ -74,6 +78,11 @@ PROXY_FETCHER = [
     "freeProxy02",
     # ....
 ]
+
+# 启动中遇到错误 required field "type_ignores" missing from Module
+
+pip install --upgrade werkzeug 
+
 ```
 
 #### 启动项目:

@@ -12,8 +12,8 @@
 """
 __author__ = 'Irene'
 
-import json
 import mysql.connector
+import json
 from handler.logHandler import LogHandler
 
 class MysqlClient(object):
