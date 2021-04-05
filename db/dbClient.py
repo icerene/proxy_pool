@@ -77,6 +77,8 @@ class DbClient(withMetaclass(Singleton)):
             __type = "ssdbClient"
         elif "REDIS" == self.db_type:
             __type = "redisClient"
+        elif "MYSQL" == self.db_type:
+            __type = "mysqlClient"
         else:
             pass
         assert __type, 'type error, Not support DB type: {}'.format(self.db_type)
