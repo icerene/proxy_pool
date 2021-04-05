@@ -34,12 +34,9 @@ class MysqlClient(object):
         self.name = ""
         self.db_name = kwargs['db']
         kwargs.pop("port")
-        self.__mydb = mysql.connector.connect(
-            host=kwargs['host'],
-            user=kwargs['username'],
-            password=kwargs['password'],
-            database=kwargs['db']
-        )
+        self.host = kwargs['host']
+        self.user = kwargs['username']
+        self.password = kwargs['password']
         """
         :field proxy: varchar(30)
         :field fail_count: int
@@ -52,16 +49,30 @@ class MysqlClient(object):
         """
         self.__fields_tuple = ("proxy", "fail_count", "region", "type", "source", "check_count", "last_status", "last_time")
         self.__fields_string = ", ".join(self.__fields_tuple)
+        
+    def connect_db():
+        self.__mydb = mysql.connector.connect(
+            host=self.host,
+            user=self.user,
+            password=self.password,
+            database=self.db_name
+        )
         self.__conn = self.__mydb.cursor()
+
+    def close_db():
+        self.__conn.close()
+        self.__mydb.close()
 
     def get(self):
         """
         返回一个代理
         :return:
         """
+        self.connect_db()
         sql = "SELECT " + self.__fields_string + " FROM " + self.name + " ORDER BY RAND() LIMIT 1"
         self.__conn.execute(sql)
         proxy = self.__conn.fetchone()
+        self.close_db()
         if proxy:
             return json.dumps(dict(zip(self.__fields_tuple,proxy)))
         else:
@@ -73,18 +84,22 @@ class MysqlClient(object):
         :param proxy_obj: Proxy obj
         :return:
         """
+        self.connect_db()
         sql = "INSERT INTO customers (" + self.__fields_string + ") VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
         proxy_dict = proxy_obj.to_dict
         proxy_tuple = tuple(proxy_dict.values())
         self.__conn.execute(sql, proxy_tuple)
         self.__mydb.commit()
-        return self.__conn.lastrowid
+        rowid = self.__conn.lastrowid
+        self.close_db()
+        return rowid
 
     def pop(self):
         """
         弹出一个代理
         :return: dict {proxy: value}
         """
+        self.connect_db()
         sql = "SELECT " + self.__fields_string + " FROM " + self.name + " LIMIT 1"
         self.__conn.execute(sql)
         proxy = self.__conn.fetchone()
@@ -93,8 +108,10 @@ class MysqlClient(object):
             sql = "DELETE FROM customers WHERE proxy = '" + proxy_dict.get("proxy", None) + "'"
             self.__conn.execute(sql)
             self.__mydb.commit()
+            self.close_db()
             return json.dumps(proxy_dict)
         else:
+            self.close_db()
             return False
 
     def delete(self, proxy_str):
@@ -103,10 +120,13 @@ class MysqlClient(object):
         :param proxy_str: proxy str
         :return:
         """
+        self.connect_db()
         sql = "DELETE FROM customers WHERE proxy = '" + proxy_str + "'"
         self.__conn.execute(sql)
         self.__mydb.commit()
-        return self.__conn.rowcount
+        rowcount = self.__conn.rowcount
+        self.close_db()
+        return rowcount
 
     def exists(self, proxy_str):
         """
@@ -114,8 +134,10 @@ class MysqlClient(object):
         :param proxy_str: proxy str
         :return:
         """
+        self.connect_db()
         self.__conn.execute("SELECT count(*) FROM " + self.name + "  WHERE proxy = '" + proxy_str + "'")
         result = self.__conn.fetchone()
+        self.close_db()
         count = result[0]
         return count
 
@@ -125,6 +147,7 @@ class MysqlClient(object):
         :param proxy_obj:
         :return:
         """
+        self.connect_db()
         sql = "UPDATE customers SET proxy = %s, fail_count = %s, region = %s, type = %s, source = %s, check_count = %s, last_status = %s, last_time = %s WHERE proxy = %s"
         proxy_dict = proxy_obj.to_dict
         proxy_str = proxy_dict.get('proxy')
@@ -132,19 +155,23 @@ class MysqlClient(object):
         proxy_values = (*proxy_tuple, proxy_str)
         self.__conn.execute(sql, proxy_values)
         self.__mydb.commit()
-        return self.__conn.rowcount
+        rowcount = self.__conn.rowcount
+        self.close_db()
+        return rowcount
 
     def getAll(self):
         """
         字典形式返回所有代理, 使用changeTable指定hash name
         :return:
         """
+        self.connect_db()
         self.__conn.execute("SELECT " + self.__fields_string + " FROM " + self.name)
         results = self.__conn.fetchall()
         proxies_dict = {}
         for proxy in results:
             proxy_dict = dict(zip(self.__fields_tuple,proxy))
             proxies[proxy_dict.get('proxy')] = json.dumps(proxy_dict)
+        self.close_db()
         return proxies_dict
 
     def clear(self):
@@ -152,19 +179,24 @@ class MysqlClient(object):
         清空所有代理, 使用changeTable指定hash name
         :return:
         """
+        self.connect_db()
         sql = "TRUNCATE TABLE " + self.name
         self.__conn.execute(sql)
         self.__mydb.commit()
-        return self.__conn.rowcount
+        rowcount = self.__conn.rowcount
+        self.close_db()
+        return rowcount
 
     def getCount(self):
         """
         返回代理数量
         :return:
         """
+        self.connect_db()
         sql = "SELECT COUNT(*) FROM " + self.name
         self.__conn.execute(sql)
         result = self.__conn.fetchone()
+        self.close_db()
         return result[0]
 
     def changeTable(self, name):
@@ -173,6 +205,7 @@ class MysqlClient(object):
         :param name:
         :return:
         """
+        self.connect_db()
         self.name = name
         sql = "SELECT count(*) FROM information_schema.TABLES WHERE TABLE_NAME = %s AND TABLE_SCHEMA = %s"
         self.__conn.execute(sql, (name, self.db_name))
@@ -180,6 +213,7 @@ class MysqlClient(object):
         count = result[0]
         if 0 == count:
             self.__conn.execute("CREATE TABLE " + name + " (id INT AUTO_INCREMENT PRIMARY KEY, proxy VARCHAR(255), fail_count int unsigned, region VARCHAR(255), type VARCHAR(255), source VARCHAR(255), check_count int unsigned, last_status VARCHAR(255), last_time VARCHAR(255))")
+        self.close_db()
 
     def test(self):
         log = LogHandler('mysql_client')
