@@ -31,6 +31,7 @@ class MysqlClient(object):
         :return:
         """
         self.name = ""
+        self.db_name = kwargs['db']
         kwargs.pop("port")
         self.__mydb = mysql.connector.connect(
             host=kwargs['host'],
@@ -170,9 +171,14 @@ class MysqlClient(object):
         :return:
         """
         self.name = name
+        sql = "SELECT count(*) FROM information_schema.TABLES WHERE TABLE_NAME = '" + name + "' AND TABLE_SCHEMA = '" + self.db_name + "'"
+        result = self.__conn.fetchone()
+        count = result[0]
+        if 0 == count:
+            self.__conn.execute("CREATE TABLE proxy (id INT AUTO_INCREMENT PRIMARY KEY, proxy VARCHAR(255), fail_count int unsigned, region VARCHAR(255), type VARCHAR(255), source VARCHAR(255), check_count int unsigned, last_status VARCHAR(255), last_time VARCHAR(255))")
 
     def test(self):
-        log = LogHandler('redis_client')
+        log = LogHandler('mysql_client')
         try:
             self.getCount()
         except TimeoutError as e:
