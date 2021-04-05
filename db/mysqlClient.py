@@ -132,8 +132,8 @@ class MysqlClient(object):
         :return:
         """
         cursor = self.get_cursor(self.__mydb)
-        sql = "DELETE FROM %s WHERE proxy LIKE %s"
-        cursor.execute(sql, (self.name, proxy_str))
+        sql = "DELETE FROM " + self.name + " WHERE proxy LIKE %s"
+        cursor.execute(sql, (proxy_str,))
         self.__mydb.commit()
         rowcount = cursor.rowcount
         self.close_cursor(cursor)
