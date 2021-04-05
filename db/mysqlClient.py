@@ -65,6 +65,7 @@ class MysqlClient(object):
 
     def get_cursor(self, conn):
         try:
+            conn.ping(reconnect=True, attempts=2, delay=5)
             return conn.cursor()
         except mysql.connector.errors.OperationalError as err:
             self.__mydb.reconnect(attempts=1, delay=0)
