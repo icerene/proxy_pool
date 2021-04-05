@@ -13,6 +13,7 @@
 __author__ = 'Irene'
 
 import mysql.connector
+from handler.logHandler import LogHandler
 
 class MysqlClient(object):
     """
