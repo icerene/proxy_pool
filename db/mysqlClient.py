@@ -171,7 +171,7 @@ class MysqlClient(object):
         proxies_dict = {}
         for proxy in results:
             proxy_dict = dict(zip(self.__fields_tuple,proxy))
-            proxies[proxy_dict.get('proxy')] = json.dumps(proxy_dict)
+            proxies_dict[proxy_dict.get('proxy')] = json.dumps(proxy_dict)
         self.close_db()
         return proxies_dict
 
