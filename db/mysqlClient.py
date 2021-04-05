@@ -59,7 +59,8 @@ class MysqlClient(object):
         返回一个代理
         :return:
         """
-        self.__conn.execute("SELECT %s FROM %s ORDER BY RAND() LIMIT 1", (self.__fields_string, self.name))
+        sql = "SELECT " + self.__fields_string + " FROM " + self.name + " ORDER BY RAND() LIMIT 1"
+        self.__conn.execute(sql)
         proxy = self.__conn.fetchone()
         if proxy:
             return json.dumps(dict(zip(self.__fields_tuple,proxy)))
@@ -84,7 +85,8 @@ class MysqlClient(object):
         弹出一个代理
         :return: dict {proxy: value}
         """
-        self.__conn.execute("SELECT %s FROM %s LIMIT 1", (self.__fields_string, self.name))
+        sql = "SELECT " + self.__fields_string + " FROM " + self.name + " LIMIT 1"
+        self.__conn.execute(sql)
         proxy = self.__conn.fetchone()
         proxy_dict = dict(zip(self.__fields_tuple,proxy))
         if proxy:
