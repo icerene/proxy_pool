@@ -12,6 +12,7 @@
 """
 __author__ = 'Irene'
 
+import json
 import mysql.connector
 from handler.logHandler import LogHandler
 
