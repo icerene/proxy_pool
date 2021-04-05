@@ -172,7 +172,8 @@ class MysqlClient(object):
         :return:
         """
         self.name = name
-        sql = "SELECT count(*) FROM information_schema.TABLES WHERE TABLE_NAME = '" + name + "' AND TABLE_SCHEMA = '" + self.db_name + "'"
+        sql = "SELECT count(*) FROM information_schema.TABLES WHERE TABLE_NAME = %s AND TABLE_SCHEMA = %s"
+        self.__conn.execute(sql, (name, self.db_name))
         result = self.__conn.fetchone()
         count = result[0]
         if 0 == count:
