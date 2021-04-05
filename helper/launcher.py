@@ -56,6 +56,7 @@ def __showConfigure():
 def __checkDBConfig():
     conf = ConfigHandler()
     db = DbClient(conf.dbConn)
+    db.changeTable(conf.tableName)
     log.info("============ DATABASE CONFIGURE ================")
     log.info("DB_TYPE: %s" % db.db_type)
     log.info("DB_HOST: %s" % db.db_host)
