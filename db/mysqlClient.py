@@ -50,7 +50,7 @@ class MysqlClient(object):
         :last_time: varchar
         """
         self.__fields_tuple = ("proxy", "fail_count", "region", "type", "source", "check_count", "last_status", "last_time")
-        self.__fields_string = ", ".join(self.__fields)
+        self.__fields_string = ", ".join(self.__fields_tuple)
         self.__conn = self.__mydb.cursor()
 
     def get(self):
